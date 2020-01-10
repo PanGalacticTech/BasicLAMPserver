@@ -1,0 +1,562 @@
+Setting up Raspberry Pi LAMP Server:
+
+
+START:
+
+1.	 
+sudo raspi-config
+
+5 – Interfacing Options.
+
+P2 – SSH  Enable
+
+Finish
+
+Reboot
+
+Log in: pi Password: Raspberry
+
+2.	
+passwd
+
+Set new Password for user pi.
+
+
+3.	
+sudo nano /etc/dhcpd.conf
+
+uncomment lines, and set static IP:
+
+# Example static IP configuration:
+#interface eth0
+
+static ip_address=192.168.1.204/24
+
+#static ip6_address=fd51:42f8:caae:d92e::ff/64
+
+static routers=192.168.1.1
+static domain_name_servers=192.168.1.1
+
+# 8.8.8.8 fd51:42f8:caae:d92e::1
+
+ctrl x   
+
+y – Yes
+
+Enter.
+
+4.	
+sudo reboot
+
+
+5.	Change Username from pi to dec < Cannot be done from SSH!!!
+
+Set passwork for root account:
+
+sudo passwd root
+
+enter new root password
+
+
+logout
+
+log back in as user root
+
+
+change pi username, enter:
+
+usermod -l dec pi
+
+change home directory to reflect new account:
+
+usermod -m -d /home/dec/dec
+
+test sudo privilages by
+
+sudo apt-get update
+
+Root can be disabled by locking password. I did not: 
+sudo passwd -l root
+
+Log out then:
+
+Log in using Putty on set IP & port 22.
+
+
+
+
+
+6.	
+sudo nano /etc/ssh/sshd_config
+
+Set new port for SSH. Set port 2583:
+
+Uncomment port 22. Set to 2583
+
+
+sudo reboot
+
+Reboot pi & putty on new port.
+
+
+
+
+
+
+7.	Install Apache:
+
+sudo apt-get install apache2 -y 
+
+
+while installing: good time to set static IP on router. Not needed but ensures no clash later.
+
+While there port forwarding can be set up:
+Port forwarding on Router:
+
+Private port 80    Public Port 80 (or 8080)   // not sure yet
+
+
+Apache homepage should now be able to be accessed from browser at static IP address.
+
+
+8.	Default page is at /var/www/html/index.html
+
+To open:
+
+cd /var/www/html 
+
+press enter
+
+ls -al
+
+change ownership of file from root to dec.,
+
+sudo chown dec: index.html
+
+Check using ls -al.
+
+9.	Install php
+
+sudo apt-get install php libapache2-mod-php -y
+
+
+10.	Remove html index file, as index.php superceids it.
+
+sudo rm index.html
+
+11.	Create file index.php
+
+sudo nano index.php
+
+(leafpad can be used instead of nano if GUI installed).
+
+
+12.	Enter some PHP content into index file
+
+<? php echo “Hello There!”;?>
+
+<?php echo date(‘Y-m-d H:i:s’);?>
+
+For PHP info:
+
+<?php php info();?>
+
+
+Ctrl x, Y Enter.
+
+Page should now be live with text and date on local network.
+
+
+If it doesn’t work here, remove index.php file and redo. 
+
+BREAK.
+
+Assuming reboot> Log in and navigate to 
+
+cd /var/www/html
+
+13.	install SQL server
+
+sudo apt-get install mysql-server php-mysql -y
+
+
+14.	Verify that MySQL is working correctly
+To check the operation of MySQL, this time we will only use the command line. To do this, we will simply connect via the command:
+
+sudo mysql --user=root
+
+15.	We will now delete the default mysql root user and create a new mysql root user, because the default one can only be used with Linux root account, and so not available for the webserver and php scripts.
+
+To do so, once your connect to MySQL, simply run thoses commands (replace password with the password you want) :
+
+
+DROP USER 'root'@'localhost';
+CREATE USER 'root'@'localhost' IDENTIFIED BY 'password';         (Password is Hotbox321!!)
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost'
+
+So you now have a web server, connected to PHP and MySQL. That’s all it takes.
+
+
+
+(On your nexts connections, you will be able to connect to mysql without using sudo,
+
+ with the command mysql --user=root --password=yourmysqlpassword).
+
+
+16.	Add PHPMyAdmin
+
+The installation of PHPMyAdmin is absolutly not necessary. In this installation, we will not take care about any special security settings !
+
+The PHPMyAdmin installation is pretty quick and easy, we simply have to use the packet manager with this command :
+
+sudo apt install phpmyadmin
+
+PHPMyAdmin installation program will ask you few question. About the dbconfig-common part, choose to not use it (as we have already configure our database). About the server to configure PHPMyAdmin for, choose Apache. And the root password is the one you set for MySQL.
+
+Check that PHPMyAdmin is working properly
+To check that PHPMyAdmin works, you will simply try to access it, using the address of your Raspberry followed by /phpmyadmin. For example, locally it will be 
+
+http://192.168.1.204/phpmyadmin
+
+If you still get an error, it could be because PHPMyAdmin has moved to another directory. In this case, try the command
+
+sudo ln -s /usr/share/phpmyadmin /var/www/html/phpmyadmin
+
+Now, we can access to PHPMyAdmin from Raspberry Pi’s browser, with the url : 
+
+http://192.168.1.204/phpmyadmin
+
+Making a server accessible from the web
+Your web server is ready. However, you probably can not access it from the internet. Indeed, it would be necessary for that your modem to redirects the requests to your Raspberry, the good ports.
+To put these redirections in place, and even get a URL, you should look to DynDNS and port forwarding !
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Router Static IP:  
+
+109.181.184.177
+
+Set host using DUC  DNC server
+
+Pangalactic.zapto.org
+
+
+Port forwarding on 2583 for SSH
+
+Port Forwarding on 80 for HTTP.
+
+Currently working.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ADDING CONTENT :
+
+Index.php already exists on homepage, so create a new page then try inserting link into index file.
+
+1.	Create new html file:
+
+sudo nano instructions.html
+
+paste these instructions into that file.  Starting with just text
+
+2.	Open up .index.php file add lines
+
+<br/>
+<a href="instructions.html">Instructions</a>
+<br/>
+
+
+Be ready to delete this shit If I fuck it up
+
+Try this
+<html> 
+
+ <title>HTML with PHP</title>
+
+ <body>
+
+ <h1>My Example</h1>
+
+ <?php
+
+//your PHP code goes here
+?>
+ <b>Here is some more HTML</b>
+
+ <?php
+
+ //more PHP code
+
+ ?>
+
+ 
+
+ </body>
+
+ </html>
+
+ Working without extra php code in HTML file.
+
+
+
+Use PRINT or ECHO
+This other way is basically the opposite; it's how you'd add HTML to a PHP file with PRINT or ECHO, where either command is used to simply print HTML on the page. With this method, you can include the HTML inside of the PHP tags.
+
+This is a good method to use for adding HTML to PHP if you only have a line or so to do.
+
+In this example, the HTML areas are bold:
+
+ <?php 
+
+ Echo "<html>";
+
+Echo
+"<title>HTML With PHP</title>";
+
+Echo
+"<b>My Example</b>";
+
+//your php code here
+Print
+"<i>Print works too!</i>";
+
+
+
+
+
+
+
+
+Setting up SFTP server to make file management easier:
+
+sudo nano /etc/ssh/sshd_config
+
+DON’T DO THIS
+add line:
+
+Subsystem sftp internal-sftp
+
+
+FUCKED UP HERE cant log on via ssh
+
+
+Sudo reboot
+
+
+Undid. 
+
+
+
+
+
+
+
+
+
+Navigated back to 
+
+Cd /var/www/html
+
+
+Changed permissions for all files in folder.
+
+In symbolic format permissions are added or deleted using the following symbols
+
+u  =  owner of the file (user)
+
+g  =  groups owner  (group)
+
+o  =  anyone else on the system (other)
+
+
+
++ =  add permission
+
+- =  remove permission
+
+
+
+r  =  read permission
+
+w = write permission
+
+x  = execute permission
+For example to add write access to the group the following command is used:
+
+chmod g+w file1
+
+
+
+NO FUCKING NEEDS
+
+sudo nano /etc/ssh/sshd_config
+
+# Line changed from login prohibit-password to login yes
+
+#PermitRootLogin prohibit-password
+PermitRootLogin yes
+
+Log in a root user. It worked this time!
+
+
+Now Website management can be setup!
+
+
+Mounting a USB drive for extra storage:
+
+Find the UUID for the drive
+
+ls -l /dev/disk/by-uuid/
+
+Printout:
+lrwxrwxrwx 1 root root 10 May 11 12:23 3BDA-1CFF -> ../../sda2
+lrwxrwxrwx 1 root root 15 May 11 12:17 6330-17DC -> ../../mmcblk0p1
+lrwxrwxrwx 1 root root 10 May 11 12:23 67E3-17ED -> ../../sda1
+lrwxrwxrwx 1 root root 15 May 11 12:17 6BC3-9F86 -> ../../mmcblk0p6
+lrwxrwxrwx 1 root root 15 May 11 12:17 8c9727b6-4af8-4a71-ae72-90af8a6f5e20 ->
+
+
+SDA 1 & SDA2  - 2 partitions?
+
+
+Find if has been mounted already
+
+cd /media
+
+ls -lh
+
+no media I,e, no mounted drives.
+
+Go home
+
+Cd
+
+Next command shows system messages file.
+cat /var/log/messages | tail -n 50
+
+
+not helpful
+
+back to
+
+
+make directory usb in media:
+
+ sudo mkdir /media/usb
+
+
+
+
+
+
+
+
+make sure user pi owns this folder
+
+sudo chown -R dec:mediagroup /media/usb
+
+chown username:groupname directory
+
+added to group as well as changing ownership
+
+$ sudo groupadd mediagroup
+Then change the directory's group and its parent to the group you just created, and make sure it's read/write/executable by any users in that group: changed pi to usb and addusers to dec, decadmin
+
+$ sudo chgrp mediagroup /media/pi
+
+$ sudo chmod 770 /media/pi
+
+Finally, add your two users to that group:sudo
+
+$ sudo adduser pi mediagroup
+$ sudo adduser amule mediagroup
+
+
+
+Mount the drive:
+
+sudo mount /dev/sda1 /media/usb -o uid=dec,gid=mediagroup
+
+It should now be useable
+
+To unmount drive:
+
+umount /media/usb
+
+If you used the fstab file to auto-mount it you will need to use :
+
+sudo umount /media/usb
+
+
+Set up Automount:
+
+sudo nano /etc/fstab
+
+add line at the end:
+
+UUID=67E3-17ED /media/usb vfat auto,nofail,noatime,users,rw,uid=dec,gid=mediagroup 0 0
+
+Do fail allows boot to continue if this step fails. Make sure UUID is set correctly.
+
+Don’t know if any of that did anything. Oh well.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
